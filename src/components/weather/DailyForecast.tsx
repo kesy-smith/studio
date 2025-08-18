@@ -3,25 +3,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DailyForecast as DailyForecastType } from '@/lib/types';
 import WeatherIcon from './WeatherIcon';
 import { Separator } from '@/components/ui/separator';
+import { useSettings } from '@/context/SettingsContext';
+import { translations } from '@/lib/translations';
+import { formatTemperature } from '@/lib/utils';
 
 interface DailyForecastProps {
   data: DailyForecastType[];
 }
 
-const celsiusToFahrenheit = (celsius: number) => Math.round(celsius * (9 / 5) + 32);
-
 const DailyForecast: FC<DailyForecastProps> = ({ data }) => {
+  const { unit, language } = useSettings();
+  const t = translations[language];
+
   const getDayOfWeek = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
     const today = new Date();
-    if (date.getDate() === today.getDate()) return 'Today';
-    return date.toLocaleDateString([], { weekday: 'long' });
+    if (date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
+      return t.today;
+    }
+    return date.toLocaleDateString(language, { weekday: 'long' });
   };
 
   return (
     <Card className="bg-card/80 backdrop-blur-sm shadow-lg">
       <CardHeader>
-        <CardTitle>7-Day Forecast</CardTitle>
+        <CardTitle>{t.dailyForecastTitle}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -34,8 +40,8 @@ const DailyForecast: FC<DailyForecastProps> = ({ data }) => {
                   <span className="hidden sm:inline text-muted-foreground">{day.condition}</span>
                 </div>
                 <p className="font-medium text-right w-24">
-                  <span>{celsiusToFahrenheit(day.maxTemp)}°</span>
-                  <span className="text-muted-foreground"> / {celsiusToFahrenheit(day.minTemp)}°</span>
+                  <span>{formatTemperature(day.maxTemp, unit)}</span>
+                  <span className="text-muted-foreground"> / {formatTemperature(day.minTemp, unit)}</span>
                 </p>
               </div>
               {index < data.length - 1 && <Separator />}

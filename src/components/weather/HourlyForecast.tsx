@@ -3,18 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import type { HourlyForecast as HourlyForecastType } from '@/lib/types';
 import WeatherIcon from './WeatherIcon';
+import { useSettings } from '@/context/SettingsContext';
+import { translations } from '@/lib/translations';
+import { formatTemperature } from '@/lib/utils';
 
 interface HourlyForecastProps {
   data: HourlyForecastType[];
 }
 
-const celsiusToFahrenheit = (celsius: number) => Math.round(celsius * (9 / 5) + 32);
-
 const HourlyForecast: FC<HourlyForecastProps> = ({ data }) => {
-  return (
+    const { unit, language } = useSettings();
+    const t = translations[language];
+
+    return (
     <Card className="bg-card/80 backdrop-blur-sm shadow-lg">
       <CardHeader>
-        <CardTitle>Hourly Forecast</CardTitle>
+        <CardTitle>{t.hourlyForecastTitle}</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea>
@@ -29,10 +33,10 @@ const HourlyForecast: FC<HourlyForecastProps> = ({ data }) => {
                         style={{ minWidth: '100px' }}
                     >
                         <p className="text-sm font-medium">
-                        {hourTime.toLocaleTimeString([], { hour: '2-digit', hour12: false })}
+                        {hourTime.toLocaleTimeString(language, { hour: '2-digit', hour12: false })}
                         </p>
                         <WeatherIcon condition={hour.condition} className="h-8 w-8 text-accent" isNight={isNight} />
-                        <p className="text-lg font-bold">{celsiusToFahrenheit(hour.temperature)}°F</p>
+                        <p className="text-lg font-bold">{formatTemperature(hour.temperature, unit)}</p>
                     </div>
                 );
             })}

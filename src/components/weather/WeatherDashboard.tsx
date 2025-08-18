@@ -9,7 +9,13 @@ import { CitySearch } from './CitySearch';
 import CurrentWeather from './CurrentWeather';
 import HourlyForecast from './HourlyForecast';
 import DailyForecast from './DailyForecast';
-import { AlertCircle, MapPin } from 'lucide-react';
+import { AlertCircle, MapPin, Settings } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { useSettings } from '@/context/SettingsContext';
+import { translations } from '@/lib/translations';
+import SettingsPanel from './SettingsPanel';
+import { Button } from '../ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 
 const mockWeatherData = (locationName: string): WeatherData => {
   const now = new Date();
@@ -43,39 +49,42 @@ export default function WeatherDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { language } = useSettings();
+  const t = translations[language];
+
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          handleSearch("Current Location"); // In a real app, you'd use coords to get location name
+          handleSearch(t.currentLocation); 
         },
         (err) => {
-          setError("Geolocation access denied. Please search for a city manually.");
+          setError(t.geolocationDenied);
           setIsLoading(false);
           toast({
-            title: "Location Access Denied",
-            description: "You can still search for a city to get weather information.",
+            title: t.locationAccessDenied,
+            description: t.locationAccessDeniedDescription,
             variant: "destructive",
           });
         }
       );
     } else {
-      setError("Geolocation is not supported by your browser. Please search for a city.");
+      setError(t.geolocationNotSupported);
       setIsLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   const handleSearch = (city: string) => {
     setIsLoading(true);
     setError(null);
-    // Simulate API call
     setTimeout(() => {
       if (city.toLowerCase() === 'error') {
-        setError('Could not find weather data for the specified city.');
+        setError(t.cityNotFound);
         setWeatherData(null);
       } else {
-        setWeatherData(mockWeatherData(city));
+        const capitalizedCity = city.charAt(0).toUpperCase() + city.slice(1);
+        setWeatherData(mockWeatherData(capitalizedCity));
       }
       setIsLoading(false);
     }, 1000);
@@ -90,41 +99,60 @@ export default function WeatherDashboard() {
   );
 
   return (
-    <div className="w-full space-y-8">
-      <CitySearch onSearch={handleSearch} isLoading={isLoading} />
-      {isLoading && !weatherData && renderSkeletons()}
-
-      {error && !isLoading && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {!isLoading && !weatherData && !error && (
-        <div className="text-center py-10">
-          <Card className="max-w-md mx-auto">
-            <CardContent className="p-6">
-                <div className="flex justify-center mb-4">
-                    <MapPin className="h-12 w-12 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Welcome to MétéoBK</h3>
-                <p className="text-muted-foreground">
-                    Enable location services or search for a city to get started.
-                </p>
-            </CardContent>
-          </Card>
+    <div className="w-full max-w-4xl mx-auto">
+      <header className="mb-4 flex justify-between items-center">
+        <div>
+            <h1 className="font-headline text-4xl font-bold text-primary sm:text-5xl">MétéoBK</h1>
+            <p className="text-muted-foreground">{t.appSubtitle}</p>
         </div>
-      )}
+        <Sheet>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Settings className="h-6 w-6" />
+                </Button>
+            </SheetTrigger>
+            <SheetContent>
+                <SettingsPanel />
+            </SheetContent>
+        </Sheet>
+      </header>
 
-      {weatherData && (
-        <div className="animate-in fade-in-50 space-y-8">
-          <CurrentWeather data={weatherData.current} />
-          <HourlyForecast data={weatherData.hourly} />
-          <DailyForecast data={weatherData.daily} />
-        </div>
-      )}
+      <div className="space-y-8">
+        <CitySearch onSearch={handleSearch} isLoading={isLoading} />
+        {isLoading && !weatherData && renderSkeletons()}
+
+        {error && !isLoading && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>{t.errorTitle}</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {!isLoading && !weatherData && !error && (
+          <div className="text-center py-10">
+            <Card className="max-w-md mx-auto">
+              <CardContent className="p-6">
+                  <div className="flex justify-center mb-4">
+                      <MapPin className="h-12 w-12 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{t.welcomeTitle}</h3>
+                  <p className="text-muted-foreground">
+                      {t.welcomeMessage}
+                  </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {weatherData && (
+          <div className="animate-in fade-in-50 space-y-8">
+            <CurrentWeather data={weatherData.current} />
+            <HourlyForecast data={weatherData.hourly} />
+            <DailyForecast data={weatherData.daily} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
