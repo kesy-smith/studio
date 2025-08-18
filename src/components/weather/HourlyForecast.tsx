@@ -8,6 +8,8 @@ interface HourlyForecastProps {
   data: HourlyForecastType[];
 }
 
+const celsiusToFahrenheit = (celsius: number) => Math.round(celsius * (9 / 5) + 32);
+
 const HourlyForecast: FC<HourlyForecastProps> = ({ data }) => {
   return (
     <Card className="bg-card/80 backdrop-blur-sm shadow-lg">
@@ -30,7 +32,7 @@ const HourlyForecast: FC<HourlyForecastProps> = ({ data }) => {
                         {hourTime.toLocaleTimeString([], { hour: '2-digit', hour12: false })}
                         </p>
                         <WeatherIcon condition={hour.condition} className="h-8 w-8 text-accent" isNight={isNight} />
-                        <p className="text-lg font-bold">{Math.round(hour.temperature)}°C</p>
+                        <p className="text-lg font-bold">{celsiusToFahrenheit(hour.temperature)}°F</p>
                     </div>
                 );
             })}

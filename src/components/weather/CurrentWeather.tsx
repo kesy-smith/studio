@@ -12,6 +12,8 @@ const formatTime = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+const celsiusToFahrenheit = (celsius: number) => Math.round(celsius * (9 / 5) + 32);
+
 const CurrentWeather: FC<CurrentWeatherProps> = ({ data }) => {
   const now = new Date().getTime() / 1000;
   const isNight = now < data.sunrise || now > data.sunset;
@@ -26,7 +28,7 @@ const CurrentWeather: FC<CurrentWeatherProps> = ({ data }) => {
           <div className="flex items-center gap-4">
             <WeatherIcon condition={data.condition} className="h-20 w-20 text-accent" isNight={isNight} />
             <div>
-              <p className="text-6xl font-bold">{Math.round(data.temperature)}°C</p>
+              <p className="text-6xl font-bold">{celsiusToFahrenheit(data.temperature)}°F</p>
               <p className="text-lg text-muted-foreground">{data.condition}</p>
             </div>
           </div>

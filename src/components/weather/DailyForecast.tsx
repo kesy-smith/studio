@@ -8,6 +8,8 @@ interface DailyForecastProps {
   data: DailyForecastType[];
 }
 
+const celsiusToFahrenheit = (celsius: number) => Math.round(celsius * (9 / 5) + 32);
+
 const DailyForecast: FC<DailyForecastProps> = ({ data }) => {
   const getDayOfWeek = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
@@ -32,8 +34,8 @@ const DailyForecast: FC<DailyForecastProps> = ({ data }) => {
                   <span className="hidden sm:inline text-muted-foreground">{day.condition}</span>
                 </div>
                 <p className="font-medium text-right w-24">
-                  <span>{Math.round(day.maxTemp)}°</span>
-                  <span className="text-muted-foreground"> / {Math.round(day.minTemp)}°</span>
+                  <span>{celsiusToFahrenheit(day.maxTemp)}°</span>
+                  <span className="text-muted-foreground"> / {celsiusToFahrenheit(day.minTemp)}°</span>
                 </p>
               </div>
               {index < data.length - 1 && <Separator />}
