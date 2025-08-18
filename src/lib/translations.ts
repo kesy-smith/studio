@@ -25,6 +25,9 @@ export const translations = {
         language: "Language",
         temperatureUnit: "Temperature Unit",
         darkMode: "Dark Mode",
+        downloadTitle: "Download App",
+        downloadDescription: "For the best experience, add this app to your home screen!",
+        downloadAction: "Got it!",
     },
     fr: {
         appSubtitle: "Votre compagnon météo ultime",
@@ -51,5 +54,8 @@ export const translations = {
         language: "Langue",
         temperatureUnit: "Unité de température",
         darkMode: "Mode sombre",
+        downloadTitle: "Télécharger l'application",
+        downloadDescription: "Pour la meilleure expérience, ajoutez cette application à votre écran d'accueil !",
+        downloadAction: "Compris !",
     },
 };

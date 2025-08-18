@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -9,13 +10,24 @@ import { CitySearch } from './CitySearch';
 import CurrentWeather from './CurrentWeather';
 import HourlyForecast from './HourlyForecast';
 import DailyForecast from './DailyForecast';
-import { AlertCircle, MapPin, Settings } from 'lucide-react';
+import { AlertCircle, Download, MapPin, Settings } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSettings } from '@/context/SettingsContext';
 import { translations } from '@/lib/translations';
 import SettingsPanel from './SettingsPanel';
 import { Button } from '../ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 const mockWeatherData = (locationName: string): WeatherData => {
   const now = new Date();
@@ -54,26 +66,8 @@ export default function WeatherDashboard() {
 
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          handleSearch(t.currentLocation); 
-        },
-        (err) => {
-          setError(t.geolocationDenied);
-          setIsLoading(false);
-          toast({
-            title: t.locationAccessDenied,
-            description: t.locationAccessDeniedDescription,
-            variant: "destructive",
-          });
-        }
-      );
-    } else {
-      setError(t.geolocationNotSupported);
-      setIsLoading(false);
-    }
-  }, [toast, t]);
+    handleSearch('Bukavu');
+  }, []);
 
   const handleSearch = (city: string) => {
     setIsLoading(true);
@@ -105,16 +99,36 @@ export default function WeatherDashboard() {
             <h1 className="font-headline text-4xl font-bold text-primary sm:text-5xl">MétéoBK</h1>
             <p className="text-muted-foreground">{t.appSubtitle}</p>
         </div>
-        <Sheet>
-            <SheetTrigger asChild>
+        <div className="flex items-center gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon">
-                    <Settings className="h-6 w-6" />
+                    <Download className="h-6 w-6" />
                 </Button>
-            </SheetTrigger>
-            <SheetContent>
-                <SettingsPanel />
-            </SheetContent>
-        </Sheet>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t.downloadTitle}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t.downloadDescription}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>{t.downloadAction}</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <Sheet>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Settings className="h-6 w-6" />
+                    </Button>
+                </SheetTrigger>
+                <SheetContent>
+                    <SettingsPanel />
+                </SheetContent>
+            </Sheet>
+        </div>
       </header>
 
       <div className="space-y-8">

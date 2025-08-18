@@ -20,7 +20,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light');
-  const [unit, setUnit] = useState<Unit>('F');
+  const [unit, setUnit] = useState<Unit>('C');
   const [language, setLanguage] = useState<Language>('fr');
 
   useEffect(() => {
